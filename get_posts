@@ -1,0 +1,32 @@
+import time
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
+posts_list = pd.read_csv("question_list.csv", header=None)[0].tolist()
+
+post_url = "https://poker.stackexchange.com/questions/6680/how-to-determine-the-winning-hands-in-poker"
+
+post_list = []
+
+
+response = requests.get(post_url)
+soup = BeautifulSoup(response.text, "html.parser")
+
+vote_cells = soup.find_all("div", {"class": "votecell"})
+for vote_cell in vote_cells:
+    print(vote_cell.find("div", {"class": "js-vote-count"}).text)
+
+post_cell = soup.find("div", {"class": "postcell"})
+print(post_cell.text)
+
+
+answer_cells = soup.find_all("div", {"class": "answercell"})
+for answer_cell in answer_cells:
+    try:
+        print(answer_cell.text)
+        author = answer_cell.find("div", {"class": "user-details"}).find("a")["href"]
+        print(f"Author: {author}")
+    except Exception as e:
+        pass
